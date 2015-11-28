@@ -1526,6 +1526,9 @@ int main(int argc, char **argv, char **envp) {
     << "KLEE: done: invalid queries = " << queriesInvalid << "\n"
     << "KLEE: done: query cex = " << queryCounterexamples << "\n";
 
+  // ----------------- Wajih
+
+
   std::stringstream stats;
   stats << "\n";
   stats << "KLEE: done: total instructions = "

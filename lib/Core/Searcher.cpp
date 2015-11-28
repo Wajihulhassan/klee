@@ -99,11 +99,14 @@ void DFSSearcher::update(ExecutionState *current,
 
 ExecutionState &BFSSearcher::selectState() {
   return *states.front();
+
 }
 
 void BFSSearcher::update(ExecutionState *current,
                          const std::set<ExecutionState*> &addedStates,
                          const std::set<ExecutionState*> &removedStates) {
+  // Wajih--
+  //printf("I am in BFS function WAJIH");
   states.insert(states.end(),
                 addedStates.begin(),
                 addedStates.end());

@@ -726,6 +726,7 @@ Executor::fork(ExecutionState &current, ref<Expr> condition, bool isInternal) {
                  stats::solverTime*MaxStaticCPSolvePct))) {
       ref<ConstantExpr> value; 
       bool success = solver->getValue(current, condition, value);
+
       assert(success && "FIXME: Unhandled solver failure");
       (void) success;
       addConstraint(current, EqExpr::create(value, condition));
@@ -853,7 +854,7 @@ Executor::fork(ExecutionState &current, ref<Expr> condition, bool isInternal) {
     ExecutionState *falseState, *trueState = &current;
 
     ++stats::forks;
-
+    printf("State Forked \n");
     falseState = trueState->branch();
     addedStates.insert(falseState);
 
@@ -1340,6 +1341,7 @@ void Executor::transferToBasicBlock(BasicBlock *dst, BasicBlock *src,
   // XXX this lookup has to go ?
   KFunction *kf = state.stack.back().kf;
   unsigned entry = kf->basicBlockEntry[dst];
+ // printf("ENTRY : %d",entry);
   state.pc = &kf->instructions[entry];
   if (state.pc->inst->getOpcode() == Instruction::PHI) {
     PHINode *first = static_cast<PHINode*>(state.pc->inst);
@@ -1417,6 +1419,7 @@ static inline const llvm::fltSemantics * fpWidthToSemantics(unsigned width) {
 
 void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
   Instruction *i = ki->inst;
+  i->dump();
   switch (i->getOpcode()) {
     // Control flow
   case Instruction::Ret: {
@@ -1517,7 +1520,12 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
       assert(bi->getCondition() == bi->getOperand(0) &&
              "Wrong operand index!");
       ref<Expr> cond = eval(ki, 0, state).value;
+      printf("I am in Br instruction case \n");
+      cond.get()->dump();
       Executor::StatePair branches = fork(state, cond, false);
+      //printf("Succesor %d \n",bi->getNumSuccessors());
+      //bi->getSuccessor(0)->dump();
+      //bi->getSuccessor(1)->dump();
 
       // NOTE: There is a hidden dependency here, markBranchVisited
       // requires that we still be in the context of the branch
@@ -1530,6 +1538,7 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
         transferToBasicBlock(bi->getSuccessor(0), bi->getParent(), *branches.first);
       if (branches.second)
         transferToBasicBlock(bi->getSuccessor(1), bi->getParent(), *branches.second);
+
     }
     break;
   }
@@ -1698,6 +1707,7 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
         bool success = solver->getValue(*free, v, value);
         assert(success && "FIXME: Unhandled solver failure");
         (void) success;
+        printf("I am in the call instruction \n");
         StatePair res = fork(*free, EqExpr::create(v, value), true);
         if (res.first) {
           uint64_t addr = value->getZExtValue();
@@ -1753,6 +1763,7 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
 
   case Instruction::Add: {
     ref<Expr> left = eval(ki, 0, state).value;
+
     ref<Expr> right = eval(ki, 1, state).value;
     bindLocal(ki, state, AddExpr::create(left, right));
     break;
@@ -1768,6 +1779,7 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
   case Instruction::Mul: {
     ref<Expr> left = eval(ki, 0, state).value;
     ref<Expr> right = eval(ki, 1, state).value;
+    //printf("I am doing multiplication \n");
     bindLocal(ki, state, MulExpr::create(left, right));
     break;
   }
@@ -2406,9 +2418,22 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
 
 void Executor::updateStates(ExecutionState *current) {
   if (searcher) {
+
+    //printf("I am in search block of UpdateStates function \n");
+    //printf("size of  addedstates %d \n",addedStates.size());
+    //printf("size of  removedstates %d \n",removedStates.size());
+
+    // Wajih Code
+    if (addedStates.size() == 1)
+  	  addedStates.clear();
+
+    // wajih Code
+
+
     searcher->update(current, addedStates, removedStates);
   }
-  
+  //printf("size of  states %d \n",states.size());
+
   states.insert(addedStates.begin(), addedStates.end());
   addedStates.clear();
   
@@ -2493,7 +2518,7 @@ void Executor::bindModuleConstants() {
 
 void Executor::run(ExecutionState &initialState) {
   bindModuleConstants();
-
+  //llvm::raw_ostream *os1 = interpreterHandler->openOutputFile("ptree-wajih.dot");
   // Delay init till now so that ticks don't accrue during
   // optimization and such.
   initTimers();
@@ -2567,7 +2592,6 @@ void Executor::run(ExecutionState &initialState) {
   searcher = constructUserSearcher(*this);
 
   searcher->update(0, states, std::set<ExecutionState*>());
-
   while (!states.empty() && !haltExecution) {
     ExecutionState &state = searcher->selectState();
     KInstruction *ki = state.pc;
@@ -2612,7 +2636,14 @@ void Executor::run(ExecutionState &initialState) {
 
     updateStates(&state);
   }
-
+//  char name[32];
+//  sprintf(name, "ptree-wajih.dot");
+ //llvm::raw_ostream *os1 = interpreterHandler->openOutputFile("ptree-wajih.dot");
+//  if (os1) {
+//    processTree->dump(*os1);
+//    delete os1;
+//  }
+  //printf("done here too0");
   delete searcher;
   searcher = 0;
   
@@ -3002,7 +3033,7 @@ void Executor::executeAlloc(ExecutionState &state,
         break;
       example = tmp;
     }
-
+    printf("I a in executeAllloca functin \n");
     StatePair fixedSize = fork(state, EqExpr::create(example, size), true);
     
     if (fixedSize.second) { 
@@ -3057,6 +3088,7 @@ void Executor::executeAlloc(ExecutionState &state,
 void Executor::executeFree(ExecutionState &state,
                            ref<Expr> address,
                            KInstruction *target) {
+  printf("I am in executeFree funciton \n");
   StatePair zeroPointer = fork(state, Expr::createIsZero(address), true);
   if (zeroPointer.first) {
     if (target)
@@ -3100,7 +3132,7 @@ void Executor::resolveExact(ExecutionState &state,
   for (ResolutionList::iterator it = rl.begin(), ie = rl.end(); 
        it != ie; ++it) {
     ref<Expr> inBounds = EqExpr::create(p, it->first->getBaseExpr());
-    
+    printf("I am in resolveExact funciton \n");
     StatePair branches = fork(*unbound, inBounds, true);
     
     if (branches.first)
@@ -3206,7 +3238,7 @@ void Executor::executeMemoryOperation(ExecutionState &state,
     const MemoryObject *mo = i->first;
     const ObjectState *os = i->second;
     ref<Expr> inBounds = mo->getBoundsCheckPointer(address, bytes);
-    
+    printf("In executeMemoryOperation funciton \n");
     StatePair branches = fork(*unbound, inBounds, true);
     ExecutionState *bound = branches.first;
 
@@ -3410,6 +3442,7 @@ void Executor::runFunctionAsMain(Function *f,
   processTree = new PTree(state);
   state->ptreeNode = processTree->root;
   run(*state);
+
   delete processTree;
   processTree = 0;
 
@@ -3422,6 +3455,7 @@ void Executor::runFunctionAsMain(Function *f,
 
   if (statsTracker)
     statsTracker->done();
+
 }
 
 unsigned Executor::getPathStreamID(const ExecutionState &state) {
