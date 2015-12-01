@@ -42,6 +42,11 @@
 #include "llvm/IR/CallSite.h"
 #endif
 
+#include "llvm/PassManager.h"
+// TODO make path better
+#include "../../../llvm-2.9/lib/Transforms/DirectedPass/DirectedPass.cpp"
+
+
 #include <cassert>
 #include <fstream>
 #include <climits>
@@ -59,6 +64,65 @@ namespace klee {
 }
 
 Searcher::~Searcher() {
+}
+
+DirectedSearcher::DirectedSearcher(Executor &_executor):executor(_executor) {
+	  Module *M = executor.kmodule->module;
+	  PassManager Passes;
+
+	  int g=0;
+	  //  Pass *P = createCallGraphCFGPass(&paths, defectFile);
+	  Pass *P = createDiffBlocksPass(&diff_BBS,&g);
+
+	  Passes.add(P);
+	  Passes.run(*M);
+
+	  printf(" Size of Diff Basic Blocks =  %d \n", diff_BBS.size());
+}
+
+ExecutionState &DirectedSearcher::selectState() {
+	//for (std::vector<ExecutionState*>::iterator it = states.begin(); it != states.end(); ++it) {
+		ExecutionState *state = states.back();
+		Instruction *state_i = state->pc->inst;
+		BasicBlock *state_bb = state_i->getParent();
+		if(state_bb->getParent() == diff_BBS.at(2)->getParent()){
+		 Module *M = executor.kmodule->module;
+		 bool * f;
+		 Pass *P = createReachabilityPass(diff_BBS.at(2),state_bb,f);
+		 PassManager Passes;
+		 Passes.add(P);
+		 Passes.run(*M);
+		}
+	//}
+  return *states.back();
+}
+
+void DirectedSearcher::update(ExecutionState *current,
+                         const std::set<ExecutionState*> &addedStates,
+                         const std::set<ExecutionState*> &removedStates) {
+  states.insert(states.end(),
+                addedStates.begin(),
+                addedStates.end());
+  for (std::set<ExecutionState*>::const_iterator it = removedStates.begin(),
+         ie = removedStates.end(); it != ie; ++it) {
+    ExecutionState *es = *it;
+    if (es == states.back()) {
+      states.pop_back();
+    } else {
+      bool ok = false;
+
+      for (std::vector<ExecutionState*>::iterator it = states.begin(),
+             ie = states.end(); it != ie; ++it) {
+        if (es==*it) {
+          states.erase(it);
+          ok = true;
+          break;
+        }
+      }
+
+      assert(ok && "invalid state removed");
+    }
+  }
 }
 
 ///
@@ -257,7 +321,7 @@ RandomPathSearcher::~RandomPathSearcher() {
 }
 
 ExecutionState &RandomPathSearcher::selectState() {
-  unsigned flips=0, bits=0;
+ unsigned flips=0, bits=0;
   PTree::Node *n = executor.processTree->root;
   
   while (!n->data) {

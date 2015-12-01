@@ -15,6 +15,11 @@
 #include <set>
 #include <map>
 #include <queue>
+#include "llvm/Function.h"
+#include "Executor.h"
+#include "llvm/Constants.h"
+#include "llvm/Instructions.h"
+#include "llvm/Module.h"
 
 namespace llvm {
   class BasicBlock;
@@ -67,6 +72,7 @@ namespace klee {
     }
 
     enum CoreSearchType {
+      Directed,
       DFS,
       BFS,
       RandomState,
@@ -79,10 +85,24 @@ namespace klee {
       NURS_QC
     };
   };
+  class DirectedSearcher : public Searcher {
+    std::vector<ExecutionState*> states;
+    Executor &executor;
+    std::vector<llvm::BasicBlock*> diff_BBS;
+  public:
+    DirectedSearcher(Executor &_executor);
+    ExecutionState &selectState();
+    void update(ExecutionState *current,
+                const std::set<ExecutionState*> &addedStates,
+                const std::set<ExecutionState*> &removedStates);
+    bool empty() { return states.empty(); }
+    void printName(llvm::raw_ostream &os) {
+      os << "DirectedSearcher\n";
+    }
+  };
 
   class DFSSearcher : public Searcher {
     std::vector<ExecutionState*> states;
-
   public:
     ExecutionState &selectState();
     void update(ExecutionState *current,
