@@ -65,7 +65,7 @@ static volatile unsigned timerTicks = 0;
 
 // XXX hack
 extern "C" unsigned dumpStates, dumpPTree;
-unsigned dumpStates = 1, dumpPTree = 1;
+unsigned dumpStates = 0, dumpPTree = 0;
 
 static void onAlarm(int) {
   ++timerTicks;
@@ -127,8 +127,7 @@ void Executor::processTimers(ExecutionState *current,
         processTree->dump(*os);
         delete os;
       }
-      // waj
-      dumpPTree = 1;
+      dumpPTree = 0;
     }
 
     if (dumpStates) {

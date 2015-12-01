@@ -854,7 +854,6 @@ Executor::fork(ExecutionState &current, ref<Expr> condition, bool isInternal) {
     ExecutionState *falseState, *trueState = &current;
 
     ++stats::forks;
-    printf("State Forked \n");
     falseState = trueState->branch();
     addedStates.insert(falseState);
 
@@ -1419,7 +1418,6 @@ static inline const llvm::fltSemantics * fpWidthToSemantics(unsigned width) {
 
 void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
   Instruction *i = ki->inst;
-  i->dump();
   switch (i->getOpcode()) {
     // Control flow
   case Instruction::Ret: {
@@ -1520,8 +1518,6 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
       assert(bi->getCondition() == bi->getOperand(0) &&
              "Wrong operand index!");
       ref<Expr> cond = eval(ki, 0, state).value;
-      printf("I am in Br instruction case \n");
-      cond.get()->dump();
       Executor::StatePair branches = fork(state, cond, false);
       //printf("Succesor %d \n",bi->getNumSuccessors());
       //bi->getSuccessor(0)->dump();
@@ -1707,7 +1703,6 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
         bool success = solver->getValue(*free, v, value);
         assert(success && "FIXME: Unhandled solver failure");
         (void) success;
-        printf("I am in the call instruction \n");
         StatePair res = fork(*free, EqExpr::create(v, value), true);
         if (res.first) {
           uint64_t addr = value->getZExtValue();
@@ -2418,22 +2413,11 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
 
 void Executor::updateStates(ExecutionState *current) {
   if (searcher) {
-
     //printf("I am in search block of UpdateStates function \n");
     //printf("size of  addedstates %d \n",addedStates.size());
     //printf("size of  removedstates %d \n",removedStates.size());
-
-    // Wajih Code
-    if (addedStates.size() == 1)
-  	  addedStates.clear();
-
-    // wajih Code
-
-
     searcher->update(current, addedStates, removedStates);
   }
-  //printf("size of  states %d \n",states.size());
-
   states.insert(addedStates.begin(), addedStates.end());
   addedStates.clear();
   
@@ -3033,7 +3017,6 @@ void Executor::executeAlloc(ExecutionState &state,
         break;
       example = tmp;
     }
-    printf("I a in executeAllloca functin \n");
     StatePair fixedSize = fork(state, EqExpr::create(example, size), true);
     
     if (fixedSize.second) { 
@@ -3088,7 +3071,6 @@ void Executor::executeAlloc(ExecutionState &state,
 void Executor::executeFree(ExecutionState &state,
                            ref<Expr> address,
                            KInstruction *target) {
-  printf("I am in executeFree funciton \n");
   StatePair zeroPointer = fork(state, Expr::createIsZero(address), true);
   if (zeroPointer.first) {
     if (target)
@@ -3132,7 +3114,6 @@ void Executor::resolveExact(ExecutionState &state,
   for (ResolutionList::iterator it = rl.begin(), ie = rl.end(); 
        it != ie; ++it) {
     ref<Expr> inBounds = EqExpr::create(p, it->first->getBaseExpr());
-    printf("I am in resolveExact funciton \n");
     StatePair branches = fork(*unbound, inBounds, true);
     
     if (branches.first)
@@ -3238,7 +3219,6 @@ void Executor::executeMemoryOperation(ExecutionState &state,
     const MemoryObject *mo = i->first;
     const ObjectState *os = i->second;
     ref<Expr> inBounds = mo->getBoundsCheckPointer(address, bytes);
-    printf("In executeMemoryOperation funciton \n");
     StatePair branches = fork(*unbound, inBounds, true);
     ExecutionState *bound = branches.first;
 
