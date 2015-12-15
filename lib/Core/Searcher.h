@@ -89,6 +89,7 @@ namespace klee {
     std::vector<ExecutionState*> states;
     Executor &executor;
     std::vector<llvm::BasicBlock*> diff_BBS;
+    std::vector<std::string> diff_vec;
   public:
     DirectedSearcher(Executor &_executor);
     ExecutionState &selectState();

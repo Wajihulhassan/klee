@@ -637,6 +637,7 @@ void Executor::branch(ExecutionState &state,
     for (unsigned i=1; i<N; ++i) {
       ExecutionState *es = result[theRNG.getInt32() % i];
       ExecutionState *ns = es->branch();
+      printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~I am here~~~~~~~~~~~~~~~~~~~~~~ \n");
       addedStates.insert(ns);
       result.push_back(ns);
       es->ptreeNode->data = 0;
@@ -855,6 +856,13 @@ Executor::fork(ExecutionState &current, ref<Expr> condition, bool isInternal) {
 
     ++stats::forks;
     falseState = trueState->branch();
+    // Wajhigh
+    Instruction *state_i = falseState->pc->inst;
+    BasicBlock *state_bb = state_i->getParent();
+    Instruction *state_i_t = trueState->pc->inst;
+    BasicBlock *state_bb_t = state_i_t->getParent();
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~ false = %s \n",state_bb->getName());
+    printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~ true = %s \n",state_bb_t->getName());
     addedStates.insert(falseState);
 
     if (RandomizeFork && theRNG.getBool())
@@ -1289,6 +1297,7 @@ void Executor::executeCall(ExecutionState &state,
       if (!mo) {
         terminateStateOnExecError(state, "out of memory (varargs)");
         return;
+
       }
 
       if ((WordSize == Expr::Int64) && (mo->address & 15)) {
@@ -1338,6 +1347,8 @@ void Executor::transferToBasicBlock(BasicBlock *dst, BasicBlock *src,
   // instructions know which argument to eval, set the pc, and continue.
   
   // XXX this lookup has to go ?
+ // Wajih
+	printf("================== Conditional %s \n",dst->getName());
   KFunction *kf = state.stack.back().kf;
   unsigned entry = kf->basicBlockEntry[dst];
  // printf("ENTRY : %d",entry);
@@ -1512,7 +1523,10 @@ void Executor::executeInstruction(ExecutionState &state, KInstruction *ki) {
   case Instruction::Br: {
     BranchInst *bi = cast<BranchInst>(i);
     if (bi->isUnconditional()) {
-      transferToBasicBlock(bi->getSuccessor(0), bi->getParent(), state);
+    	//Wajih
+    	BasicBlock* bb =bi->getSuccessor(0);
+    	printf("~~~~~~~~~~~~~~~~~~~~~~~~ unconditional %s \n",bb->getName());
+     transferToBasicBlock(bi->getSuccessor(0), bi->getParent(), state);
     } else {
       // FIXME: Find a way that we don't have this hidden dependency.
       assert(bi->getCondition() == bi->getOperand(0) &&

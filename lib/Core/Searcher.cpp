@@ -47,10 +47,11 @@
 #include "../../../llvm-2.9/lib/Transforms/DirectedPass/DirectedPass.cpp"
 
 
+
 #include <cassert>
 #include <fstream>
 #include <climits>
-
+#include <stdlib.h>
 using namespace klee;
 using namespace llvm;
 
@@ -69,31 +70,55 @@ Searcher::~Searcher() {
 DirectedSearcher::DirectedSearcher(Executor &_executor):executor(_executor) {
 	  Module *M = executor.kmodule->module;
 	  PassManager Passes;
+	  //int g = 0;
+//	  Pass *P = createDiffBlocksPass(&diff_BBS);
+//	  printf(" Wajih Hurray \n");
+//
+//	  Passes.add(P);
+//	  printf(" Wajih Hurray 22 \n");
+//	  Passes.run(*M);
+//	  printf(" Wajih Hurray 33 \n");
 
-	  int g=0;
-	  //  Pass *P = createCallGraphCFGPass(&paths, defectFile);
-	  Pass *P = createDiffBlocksPass(&diff_BBS,&g);
+	  int status = system("opt -load /home/klee/klee/llvm-2.9/Release/lib/LLVMDirectedPass.so -diffFinder /tmp/linked_klee.o");
 
-	  Passes.add(P);
-	  Passes.run(*M);
-
-	  printf(" Size of Diff Basic Blocks =  %d \n", diff_BBS.size());
+	  std::ifstream readFile;
+	  readFile.open("/tmp/diff_file.txt");
+	  while(!readFile.eof()){
+		  std::string temp_str;
+		  getline(readFile,temp_str);
+		  if(!temp_str.empty())
+			  diff_vec.push_back(temp_str);
+		  	  printf(" Size of Diff Basic Blocks =  %s \n", temp_str.c_str());
+	  }
+	  readFile.close();
+	  printf(" Size of Diff Basic Blocks =  %d \n", diff_vec.size());
 }
 
 ExecutionState &DirectedSearcher::selectState() {
 	//for (std::vector<ExecutionState*>::iterator it = states.begin(); it != states.end(); ++it) {
+
 		ExecutionState *state = states.back();
 		Instruction *state_i = state->pc->inst;
 		BasicBlock *state_bb = state_i->getParent();
-		if(state_bb->getParent() == diff_BBS.at(2)->getParent()){
-		 Module *M = executor.kmodule->module;
-		 bool * f;
-		 Pass *P = createReachabilityPass(diff_BBS.at(2),state_bb,f);
-		 PassManager Passes;
-		 Passes.add(P);
-		 Passes.run(*M);
+		std::string temp_str = state_bb->getParent()->getName();
+		if( temp_str != "main"){
+
+			Module *M = executor.kmodule->module;
+			bool  f;
+			int* t = new int; // 0 false and 1 true
+			*t = 1;
+			Pass *P = createReachabilityPass(diff_vec.at(2),state_bb,t);
+
+
+			PassManager Passes;
+			Passes.add(P);
+			Passes.run(*M);
+			printf("TRUE %d \n",*t);
+
 		}
+
 	//}
+
   return *states.back();
 }
 
