@@ -68,7 +68,7 @@ Searcher::~Searcher() {
 }
 
 DirectedSearcher::DirectedSearcher(Executor &_executor):executor(_executor) {
-	  Module *M = executor.kmodule->module;
+  //Module *M = executor.kmodule->module;
 	  PassManager Passes;
 	  //int g = 0;
 //	  Pass *P = createDiffBlocksPass(&diff_BBS);
@@ -95,7 +95,7 @@ DirectedSearcher::DirectedSearcher(Executor &_executor):executor(_executor) {
 }
 
 ExecutionState &DirectedSearcher::selectState() {
-	//for (std::vector<ExecutionState*>::iterator it = states.begin(); it != states.end(); ++it) {
+  /*for (std::vector<ExecutionState*>::iterator it = states.begin(); it != states.end(); ++it) {
 
 		ExecutionState *state = states.back();
 		Instruction *state_i = state->pc->inst;
@@ -117,9 +117,33 @@ ExecutionState &DirectedSearcher::selectState() {
 
 		}
 
-	//}
-
-  return *states.back();
+	}
+  
+	return *states.back();*/
+  while(!states.empty()) {
+    ExecutionState *state = states.back();
+    Instruction *state_i = state->pc->inst;
+    BasicBlock *state_bb = state_i->getParent();
+    std::string bb_name = state_bb->getParent()->getName();
+    //Module *M = executor.kmodule->module;
+    int* t = new int;
+    *t = 1;
+    //Pass *P;
+    for (std::vector<std::string>::iterator it = diff_vec.begin(); it != diff_vec.end(); ++it) {
+      //P = createReachabilityPass(*it, state_bb, t);
+      if(t) {
+	return *state;
+      } else {
+	executor.terminateStateEarly(*state, "State explored!");
+	if(states.size() == 1) {
+	  ExecutionState* state = states.back();
+	  states.pop_back();
+	  return *state;
+	}
+	states.pop_back();
+      }
+    }
+  }
 }
 
 void DirectedSearcher::update(ExecutionState *current,

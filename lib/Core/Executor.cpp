@@ -2591,7 +2591,11 @@ void Executor::run(ExecutionState &initialState) {
 
   searcher->update(0, states, std::set<ExecutionState*>());
   while (!states.empty() && !haltExecution) {
+    printf("loop \n");
     ExecutionState &state = searcher->selectState();
+    if(states.empty()) {
+      break;
+    }
     KInstruction *ki = state.pc;
     stepInstruction(state);
 
