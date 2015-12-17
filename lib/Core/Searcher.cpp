@@ -119,26 +119,36 @@ ExecutionState &DirectedSearcher::selectState() {
 	}
   
 	return *states.back();*/
+
   while(!states.empty()) {
     ExecutionState *state = states.back();
     Instruction *state_i = state->pc->inst;
     BasicBlock *state_bb = state_i->getParent();
-    
-    //Module *M = executor.kmodule->module;
+    std::string temp_str = state_bb->getParent()->getName();
+    if( temp_str.compare( "main") == 0){
+      return *state;
+    }
+    Module *M = executor.kmodule->module;
     int* t = new int;
     *t = 0;
-    Pass *P;
     for (std::vector<std::string>::iterator it = diff_vec.begin(); it != diff_vec.end(); ++it) {
+      if((*it).length() == 0) {
+	continue;
+      }
+      PassManager Passes;
+      Pass *P;
+      
       P = createReachabilityPass(*it, state_bb, t);
-      printf("Is reachable :%d\n", *t);
+      Passes.add(P);
+      Passes.run(*M);
+      
       if(*t == 1) {
-	printf("%s get selected \n", state_bb->getName());
+	//printf("%s get selected \n", state_bb->getName());
 	return *state;
       }
     }
-    printf("Prune this state \n");
+    //printf("Prune this state \n");
     executor.terminateStateEarly(*state, "State already explored!");
-
     if(states.size() == 1) {
       states.pop_back();
       return *state;

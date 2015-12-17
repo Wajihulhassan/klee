@@ -2591,13 +2591,14 @@ void Executor::run(ExecutionState &initialState) {
   searcher = constructUserSearcher(*this);
   
   searcher->update(0, states, std::set<ExecutionState*>());
-  std::cout<< states.size() << " size" << std::endl;
+  int total_states;
+  total_states = 0;
   while (!states.empty() && !haltExecution) {
     ExecutionState &state = searcher->selectState();
     if(states.empty()) {
       break;
     }
-    
+    total_states = total_states + 1;
     KInstruction *ki = state.pc;
     stepInstruction(state);
 
@@ -2639,6 +2640,7 @@ void Executor::run(ExecutionState &initialState) {
     }
 
     updateStates(&state);
+    printf("Totally %d states explored\n", total_states);
   }
 //  char name[32];
 //  sprintf(name, "ptree-wajih.dot");
