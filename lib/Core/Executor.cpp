@@ -93,6 +93,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <iosfwd>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -2588,14 +2589,15 @@ void Executor::run(ExecutionState &initialState) {
   }
 
   searcher = constructUserSearcher(*this);
-
+  
   searcher->update(0, states, std::set<ExecutionState*>());
+  std::cout<< states.size() << " size" << std::endl;
   while (!states.empty() && !haltExecution) {
-    printf("loop \n");
     ExecutionState &state = searcher->selectState();
     if(states.empty()) {
       break;
     }
+    
     KInstruction *ki = state.pc;
     stepInstruction(state);
 
