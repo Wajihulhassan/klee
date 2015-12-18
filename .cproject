@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
-		<cconfiguration id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1257844627">
-			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1257844627" moduleId="org.eclipse.cdt.core.settings" name="Default">
-				<externalSettings>
-					<externalSetting/>
-				</externalSettings>
+		<cconfiguration id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1551124630">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1551124630" moduleId="org.eclipse.cdt.core.settings" name="Default">
+				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
@@ -14,38 +12,28 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1257844627" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
-					<folderInfo id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1257844627.1624416159" name="/" resourcePath="">
-						<toolChain id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1340362528" name="LLVM with Clang (Linux)" superClass="cdt.managedbuild.toolchain.llvm.clang.linux.base">
-							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.llvm.platform.base.585102615" isAbstract="true" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.llvm.platform.base"/>
-							<builder buildPath="${workspace_loc:/klee}/Default" id="cdt.managedbuild.target.llvm.builder.base.1873484824" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="CDT Internal Builder" superClass="cdt.managedbuild.target.llvm.builder.base"/>
-							<tool id="cdt.managedbuild.tool.llvm.assembler.base.1383064221" name="LLVM assembler" superClass="cdt.managedbuild.tool.llvm.assembler.base"/>
-							<tool id="cdt.managedbuild.tool.llvm.archiver.base.1323485956" name="LLVM archiver" superClass="cdt.managedbuild.tool.llvm.archiver.base"/>
-							<tool id="cdt.managedbuild.tool.llvm.c.compiler.base.1194492787" name="LLVM Clang" superClass="cdt.managedbuild.tool.llvm.c.compiler.base">
-								<option id="llvm.c_cpp.compiler.option.include.paths.1007792394" name="Include paths (-I)" superClass="llvm.c_cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/include/x86_64-linux-gnu"/>
-									<listOptionValue builtIn="false" value="/home/klee/klee/llvm-2.9/include"/>
-									<listOptionValue builtIn="false" value="/home/klee/klee/klee/include"/>
-								</option>
-								<inputType id="cdt.managedbuild.tool.llvm.c.compiler.input.1364484200" superClass="cdt.managedbuild.tool.llvm.c.compiler.input"/>
+				<configuration buildProperties="" id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1551124630" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1551124630.1742091300" name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.llvm.clang.linux.base.1557941730" name="LLVM with Clang (Linux)" superClass="cdt.managedbuild.toolchain.llvm.clang.linux.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.llvm.platform.base.1640885049" isAbstract="true" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.llvm.platform.base"/>
+							<builder buildPath="${workspace_loc:/klee}/Default" id="cdt.managedbuild.target.llvm.builder.base.1736288401" managedBuildOn="false" name="CDT Internal Builder.Default" superClass="cdt.managedbuild.target.llvm.builder.base"/>
+							<tool id="cdt.managedbuild.tool.llvm.assembler.base.1564144756" name="LLVM assembler" superClass="cdt.managedbuild.tool.llvm.assembler.base"/>
+							<tool id="cdt.managedbuild.tool.llvm.archiver.base.59068798" name="LLVM archiver" superClass="cdt.managedbuild.tool.llvm.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.llvm.c.compiler.base.1816158671" name="LLVM Clang" superClass="cdt.managedbuild.tool.llvm.c.compiler.base">
+								<inputType id="cdt.managedbuild.tool.llvm.c.compiler.input.597942925" superClass="cdt.managedbuild.tool.llvm.c.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.llvm.cpp.compiler.base.266091450" name="LLVM Clang++" superClass="cdt.managedbuild.tool.llvm.cpp.compiler.base">
-								<option id="llvm.c_cpp.compiler.option.include.paths.183004582" name="Include paths (-I)" superClass="llvm.c_cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/include/x86_64-linux-gnu"/>
-									<listOptionValue builtIn="false" value="/home/klee/klee/llvm-2.9/include"/>
-									<listOptionValue builtIn="false" value="/home/klee/klee/klee/include"/>
-								</option>
-								<inputType id="cdt.managedbuild.tool.llvm.cpp.compiler.input.395501694" superClass="cdt.managedbuild.tool.llvm.cpp.compiler.input"/>
+							<tool id="cdt.managedbuild.tool.llvm.cpp.compiler.base.187217471" name="LLVM Clang++" superClass="cdt.managedbuild.tool.llvm.cpp.compiler.base">
+								<inputType id="cdt.managedbuild.tool.llvm.cpp.compiler.input.1440764234" superClass="cdt.managedbuild.tool.llvm.cpp.compiler.input"/>
 							</tool>
-							<tool id="cdt.managedbuild.tool.llvm.c.linker.base.1177789034" name="LLVM Clang C linker" superClass="cdt.managedbuild.tool.llvm.c.linker.base"/>
-							<tool id="cdt.managedbuild.tool.llvm.cpp.linker.base.181140396" name="LLVM Clang C++ linker" superClass="cdt.managedbuild.tool.llvm.cpp.linker.base">
-								<option id="llvm.c.link.option.libs.475953081" name="Libraries (-l)" superClass="llvm.c.link.option.libs" valueType="libs">
+							<tool id="cdt.managedbuild.tool.llvm.c.linker.base.678197410" name="LLVM Clang C linker" superClass="cdt.managedbuild.tool.llvm.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.llvm.cpp.linker.base.1291684999" name="LLVM Clang C++ linker" superClass="cdt.managedbuild.tool.llvm.cpp.linker.base">
+								<option id="llvm.c.link.option.libs.515749540" superClass="llvm.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="stdc++"/>
 								</option>
-								<option id="llvm.c.link.option.paths.618164745" name="Library search path (-L)" superClass="llvm.c.link.option.paths" valueType="libPaths">
+								<option id="llvm.c.link.option.paths.213036819" superClass="llvm.c.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/local/llvm-gcc4.2-2.9-x86_64-linux/lib64/"/>
 								</option>
-								<inputType id="cdt.managedbuild.tool.llvm.c.linker.input.1023410287" superClass="cdt.managedbuild.tool.llvm.c.linker.input">
+								<inputType id="cdt.managedbuild.tool.llvm.c.linker.input.396756963" superClass="cdt.managedbuild.tool.llvm.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
@@ -57,17 +45,11 @@
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
 	</storageModule>
-	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="klee.null.520760586" name="klee"/>
-	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="Default">
-			<resource resourceType="PROJECT" workspacePath="/klee"/>
-		</configuration>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="klee.null.22936256" name="klee"/>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 </cproject>

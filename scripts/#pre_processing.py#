@@ -48,7 +48,6 @@ if __name__ == "__main__":
                     new_fil1.write(line)
                 for line in l[1]:
                     new_fil2.write(line)
-                
             pass
             #skip include and function name
             p = [2, 2]
