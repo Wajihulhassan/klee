@@ -2523,8 +2523,12 @@ void Executor::run(ExecutionState &initialState) {
   initTimers();
 
   states.insert(&initialState);
-
-  if (usingSeeds) {
+  bool directed = true;
+  /*
+  if(DirectedSearcher *s = dyn_cast<DirectedSearcher>(searcher)) {
+    directed = true;
+    }*/
+  if (usingSeeds && !directed) {
     std::vector<SeedInfo> &v = seedMap[&initialState];
     
     for (std::vector<KTest*>::const_iterator it = usingSeeds->begin(), 
@@ -2598,8 +2602,32 @@ void Executor::run(ExecutionState &initialState) {
     if(states.empty()) {
       break;
     }
+    
     total_states = total_states + 1;
     KInstruction *ki = state.pc;
+    if(usingSeeds && state.stack.size() <= 1) {
+      //printf("SEED FOUND FOR LEAD NODE\n");
+      std::map<ExecutionState*, std::vector<SeedInfo> >::iterator it = seedMap.find(&state);
+      bool isSeeding = it != seedMap.end();
+      bool trueSeed = false;
+      bool falseSeed = false;
+      for(std::vector<SeedInfo>::iterator siit = it->second.begin(),
+	    siie = it->second.end(); siit != siit; ++siit) {
+	ref<ConstantExpr> res;
+	ref<Expr> cond = eval(ki, 0, state).value;
+	bool success = solver->getValue(state, siit->assignment.evaluate(cond), res);
+	if (res->isTrue()) {
+	  trueSeed = true;
+	} else {
+	  falseSeed = true;
+	}
+	if(trueSeed && falseSeed)
+	  break;
+      }
+      if(trueSeed && falseSeed) {
+	continue;
+      }
+    }
     stepInstruction(state);
 
     executeInstruction(state, ki);
@@ -3528,7 +3556,7 @@ bool Executor::getSymbolicSolution(const ExecutionState &state,
       mo->cexPreferences.begin(), pie = mo->cexPreferences.end();
     for (; pi != pie; ++pi) {
       bool mustBeTrue;
-      // Attempt to bound byte to constraints held in cexPreferences
+      // Attempt to bound byte to constraints hesld in cexPreferences
       bool success = solver->mustBeTrue(tmp, Expr::createIsZero(*pi), 
 					mustBeTrue);
       // If it isn't possible to constrain this particular byte in the desired
